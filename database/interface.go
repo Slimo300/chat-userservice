@@ -1,7 +1,7 @@
 package database
 
 import (
-	"github.com/Slimo300/MicroservicesChatApp/backend/user-service/models"
+	"github.com/Slimo300/chat-userservice/models"
 	"github.com/google/uuid"
 )
 

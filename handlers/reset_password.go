@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/Slimo300/MicroservicesChatApp/backend/lib/apperrors"
-	emails "github.com/Slimo300/MicroservicesChatApp/backend/user-service/email"
+	emails "github.com/Slimo300/chat-userservice/email"
 	"github.com/gin-gonic/gin"
 )
 

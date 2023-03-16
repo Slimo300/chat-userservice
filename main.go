@@ -15,10 +15,10 @@ import (
 	"github.com/Slimo300/MicroservicesChatApp/backend/lib/configuration"
 	"github.com/Slimo300/MicroservicesChatApp/backend/lib/msgqueue/kafka"
 	"github.com/Slimo300/MicroservicesChatApp/backend/lib/storage"
-	"github.com/Slimo300/MicroservicesChatApp/backend/user-service/database/orm"
-	"github.com/Slimo300/MicroservicesChatApp/backend/user-service/email"
-	"github.com/Slimo300/MicroservicesChatApp/backend/user-service/handlers"
-	"github.com/Slimo300/MicroservicesChatApp/backend/user-service/routes"
+	"github.com/Slimo300/chat-userservice/database/orm"
+	"github.com/Slimo300/chat-userservice/email"
+	"github.com/Slimo300/chat-userservice/handlers"
+	"github.com/Slimo300/chat-userservice/routes"
 )
 
 func main() {

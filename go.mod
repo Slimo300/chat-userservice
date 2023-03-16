@@ -1,4 +1,4 @@
-module github.com/Slimo300/MicroservicesChatApp/backend/user-service
+module github.com/Slimo300/chat-userservice
 
 go 1.19
 

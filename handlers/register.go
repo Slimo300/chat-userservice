@@ -6,8 +6,8 @@ import (
 
 	"github.com/Slimo300/MicroservicesChatApp/backend/lib/apperrors"
 	"github.com/Slimo300/MicroservicesChatApp/backend/lib/events"
-	"github.com/Slimo300/MicroservicesChatApp/backend/user-service/email"
-	"github.com/Slimo300/MicroservicesChatApp/backend/user-service/models"
+	"github.com/Slimo300/chat-userservice/email"
+	"github.com/Slimo300/chat-userservice/models"
 	"github.com/gin-gonic/gin"
 )
 

@@ -8,9 +8,9 @@ import (
 	"testing"
 
 	"github.com/Slimo300/MicroservicesChatApp/backend/lib/apperrors"
-	dbmock "github.com/Slimo300/MicroservicesChatApp/backend/user-service/database/mock"
-	"github.com/Slimo300/MicroservicesChatApp/backend/user-service/email"
-	"github.com/Slimo300/MicroservicesChatApp/backend/user-service/handlers"
+	dbmock "github.com/Slimo300/chat-userservice/database/mock"
+	"github.com/Slimo300/chat-userservice/email"
+	"github.com/Slimo300/chat-userservice/handlers"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/mock"

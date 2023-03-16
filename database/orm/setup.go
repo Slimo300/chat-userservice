@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/Slimo300/MicroservicesChatApp/backend/user-service/models"
+	"github.com/Slimo300/chat-userservice/models"
 	"gorm.io/driver/mysql"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"

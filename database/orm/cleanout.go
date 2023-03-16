@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/Slimo300/MicroservicesChatApp/backend/user-service/models"
+	"github.com/Slimo300/chat-userservice/models"
 )
 
 func (db *Database) CleanCodes(interval time.Duration) {

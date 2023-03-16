@@ -4,8 +4,8 @@ import (
 	"github.com/Slimo300/MicroservicesChatApp/backend/lib/auth"
 	"github.com/Slimo300/MicroservicesChatApp/backend/lib/msgqueue"
 	"github.com/Slimo300/MicroservicesChatApp/backend/lib/storage"
-	"github.com/Slimo300/MicroservicesChatApp/backend/user-service/database"
-	"github.com/Slimo300/MicroservicesChatApp/backend/user-service/email"
+	"github.com/Slimo300/chat-userservice/database"
+	"github.com/Slimo300/chat-userservice/email"
 )
 
 type Server struct {

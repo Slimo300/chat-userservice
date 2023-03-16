@@ -2,7 +2,7 @@ package routes
 
 import (
 	"github.com/Slimo300/MicroservicesChatApp/backend/lib/auth"
-	"github.com/Slimo300/MicroservicesChatApp/backend/user-service/handlers"
+	"github.com/Slimo300/chat-userservice/handlers"
 	limits "github.com/gin-contrib/size"
 	"github.com/gin-gonic/gin"
 )
