@@ -36,7 +36,7 @@ ENV DOMAIN=localhost
 # Kafka Address
 ENV BROKER_ADDRESS=
 # Directory on docker container in which SSL certificate and private key should be
-ENV CERT_DIR=/etc/cert
+ENV CERT_DIR=/cert
 # S3 Bucket name for storing user profile pictures
 ENV S3_BUCKET=
 
