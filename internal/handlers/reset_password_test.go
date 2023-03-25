@@ -8,9 +8,9 @@ import (
 	"testing"
 
 	"github.com/Slimo300/MicroservicesChatApp/backend/lib/apperrors"
-	dbmock "github.com/Slimo300/chat-userservice/database/mock"
-	"github.com/Slimo300/chat-userservice/email"
-	"github.com/Slimo300/chat-userservice/handlers"
+	emails "github.com/Slimo300/chat-emailservice/pkg/client"
+	dbmock "github.com/Slimo300/chat-userservice/internal/database/mock"
+	"github.com/Slimo300/chat-userservice/internal/handlers"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/mock"
@@ -32,16 +32,16 @@ func (s *ResetPasswordSuite) SetupSuite() {
 	db.On("ResetPassword", "invalidCode", mock.Anything).Return(apperrors.NewNotFound("reset code", "invalidCode"))
 	db.On("ResetPassword", "validCode", mock.Anything).Return(nil)
 
-	emailService := new(email.MockEmailService)
-	emailService.On("SendResetPasswordEmail", mock.Anything).Return(nil)
+	emailClient := new(emails.MockEmailClient)
+	emailClient.On("SendResetPasswordEmail", mock.Anything).Return(nil)
 
 	s.server = handlers.Server{
-		DB:           db,
-		EmailService: emailService,
+		DB:          db,
+		EmailClient: emailClient,
 	}
 }
 
-func (s ResetPasswordSuite) TestForgotPassword() {
+func (s *ResetPasswordSuite) TestForgotPassword() {
 	gin.SetMode(gin.TestMode)
 
 	testCases := []struct {
@@ -79,13 +79,15 @@ func (s ResetPasswordSuite) TestForgotPassword() {
 		s.Equal(tC.expectedStatusCode, response.StatusCode)
 
 		var msg gin.H
-		json.NewDecoder(response.Body).Decode(&msg)
+		if err := json.NewDecoder(response.Body).Decode(&msg); err != nil {
+			s.Fail(err.Error())
+		}
 
 		s.Equal(tC.expectedResponse, msg)
 	}
 }
 
-func (s ResetPasswordSuite) TestResetForgottenPassword() {
+func (s *ResetPasswordSuite) TestResetForgottenPassword() {
 	gin.SetMode(gin.TestMode)
 
 	testCases := []struct {
@@ -141,7 +143,9 @@ func (s ResetPasswordSuite) TestResetForgottenPassword() {
 			s.Equal(tC.expectedStatusCode, response.StatusCode)
 
 			var msg gin.H
-			json.NewDecoder(response.Body).Decode(&msg)
+			if err := json.NewDecoder(response.Body).Decode(&msg); err != nil {
+				s.Fail(err.Error())
+			}
 
 			s.Equal(tC.expectedResponse, msg)
 		})

@@ -5,8 +5,8 @@ import (
 	"time"
 
 	"github.com/Slimo300/MicroservicesChatApp/backend/lib/apperrors"
-	"github.com/Slimo300/chat-userservice/database"
-	"github.com/Slimo300/chat-userservice/models"
+	"github.com/Slimo300/chat-userservice/internal/database"
+	"github.com/Slimo300/chat-userservice/internal/models"
 	"github.com/google/uuid"
 	"github.com/thanhpk/randstr"
 	"gorm.io/gorm"

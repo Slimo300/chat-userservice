@@ -10,13 +10,14 @@ import (
 	"time"
 
 	"github.com/Slimo300/MicroservicesChatApp/backend/lib/apperrors"
-	"github.com/Slimo300/MicroservicesChatApp/backend/lib/auth"
-	"github.com/Slimo300/MicroservicesChatApp/backend/lib/auth/pb"
-	mockdb "github.com/Slimo300/chat-userservice/database/mock"
-	"github.com/Slimo300/chat-userservice/handlers"
-	"github.com/Slimo300/chat-userservice/models"
+	tokens "github.com/Slimo300/chat-tokenservice/pkg/client"
+	tokenspb "github.com/Slimo300/chat-tokenservice/pkg/client/pb"
+	mockdb "github.com/Slimo300/chat-userservice/internal/database/mock"
+	"github.com/Slimo300/chat-userservice/internal/handlers"
+	"github.com/Slimo300/chat-userservice/internal/models"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
+	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -35,34 +36,34 @@ func (s *AuthTestSuite) SetupSuite() {
 	db.On("SignIn", "host2@net.pl", "password12").Return(models.User{}, apperrors.NewBadRequest("wrong email or password"))
 	db.On("SignIn", "host@net.pl", "password").Return(models.User{}, apperrors.NewBadRequest("wrong email or password"))
 
-	tokenService := new(auth.MockTokenClient)
+	tokenClient := new(tokens.MockTokenClient)
 
-	tokenService.On("NewPairFromUserID", s.ids["userOK"]).Return(&pb.TokenPair{
+	tokenClient.On("NewPairFromUserID", mock.Anything, s.ids["userOK"]).Return(&tokenspb.TokenPair{
 		AccessToken:  "validAccessToken",
 		RefreshToken: "validRefreshToken",
 		Error:        "",
 	}, nil)
-	tokenService.On("DeleteUserToken", "validRefreshToken").Return(nil)
-	tokenService.On("DeleteUserToken", "invalidRefreshToken").Return(errors.New("invalid refresh token"))
-	tokenService.On("NewPairFromRefresh", "validRefreshToken").Return(&pb.TokenPair{
+	tokenClient.On("DeleteUserToken", mock.Anything, "validRefreshToken").Return(nil)
+	tokenClient.On("DeleteUserToken", mock.Anything, "invalidRefreshToken").Return(errors.New("invalid refresh token"))
+	tokenClient.On("NewPairFromRefresh", mock.Anything, "validRefreshToken").Return(&tokenspb.TokenPair{
 		AccessToken:  "validAccessToken",
 		RefreshToken: "validRefreshToken",
 		Error:        "",
 	}, nil)
-	tokenService.On("NewPairFromRefresh", "expiredRefreshToken").Return(&pb.TokenPair{
+	tokenClient.On("NewPairFromRefresh", mock.Anything, "expiredRefreshToken").Return(&tokenspb.TokenPair{
 		AccessToken:  "",
 		RefreshToken: "",
 		Error:        "Token Expired",
 	}, nil)
-	tokenService.On("NewPairFromRefresh", "blacklistedRefreshToken").Return(&pb.TokenPair{
+	tokenClient.On("NewPairFromRefresh", mock.Anything, "blacklistedRefreshToken").Return(&tokenspb.TokenPair{
 		AccessToken:  "",
 		RefreshToken: "",
 		Error:        "Token Blacklisted",
 	}, nil)
 
 	s.server = handlers.Server{
-		DB:           db,
-		TokenService: tokenService,
+		DB:          db,
+		TokenClient: tokenClient,
 	}
 
 }
@@ -110,14 +111,16 @@ func (s *AuthTestSuite) TestSignIn() {
 			s.Equal(tC.expectedStatusCode, response.StatusCode)
 
 			var respBody gin.H
-			json.NewDecoder(response.Body).Decode(&respBody)
+			if err := json.NewDecoder(response.Body).Decode(&respBody); err != nil {
+				s.Fail(err.Error())
+			}
 
 			s.Equal(tC.expectedResponse, respBody)
 		})
 	}
 }
 
-func (s AuthTestSuite) TestSignOut() {
+func (s *AuthTestSuite) TestSignOut() {
 	gin.SetMode(gin.TestMode)
 
 	testCases := []struct {
@@ -168,13 +171,15 @@ func (s AuthTestSuite) TestSignOut() {
 			s.Equal(tC.expectedStatusCode, response.StatusCode)
 
 			var respBody gin.H
-			json.NewDecoder(response.Body).Decode(&respBody)
+			if err := json.NewDecoder(response.Body).Decode(&respBody); err != nil {
+				s.Fail(err.Error())
+			}
 			s.Equal(tC.expectedResponse, respBody)
 		})
 	}
 }
 
-func (s AuthTestSuite) TestRefresh() {
+func (s *AuthTestSuite) TestRefresh() {
 	gin.SetMode(gin.TestMode)
 
 	testCases := []struct {
@@ -231,12 +236,14 @@ func (s AuthTestSuite) TestRefresh() {
 			s.Equal(tC.expectedStatusCode, response.StatusCode)
 
 			var respBody gin.H
-			json.NewDecoder(response.Body).Decode(&respBody)
+			if err := json.NewDecoder(response.Body).Decode(&respBody); err != nil {
+				s.Fail(err.Error())
+			}
 			s.Equal(tC.expectedResponse, respBody)
 		})
 	}
 }
 
-func TestUserSuite(t *testing.T) {
+func TestAuthSuite(t *testing.T) {
 	suite.Run(t, &AuthTestSuite{})
 }

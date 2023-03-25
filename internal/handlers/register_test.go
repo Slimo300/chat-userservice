@@ -9,10 +9,10 @@ import (
 
 	"github.com/Slimo300/MicroservicesChatApp/backend/lib/apperrors"
 	mockqueue "github.com/Slimo300/MicroservicesChatApp/backend/lib/msgqueue/mock"
-	mockdb "github.com/Slimo300/chat-userservice/database/mock"
-	"github.com/Slimo300/chat-userservice/email"
-	"github.com/Slimo300/chat-userservice/handlers"
-	"github.com/Slimo300/chat-userservice/models"
+	emails "github.com/Slimo300/chat-emailservice/pkg/client"
+	mockdb "github.com/Slimo300/chat-userservice/internal/database/mock"
+	"github.com/Slimo300/chat-userservice/internal/handlers"
+	"github.com/Slimo300/chat-userservice/internal/models"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/mock"
@@ -40,17 +40,17 @@ func (s *RegisterSuite) SetupSuite() {
 	emitter := new(mockqueue.MockEmitter)
 	emitter.On("Emit", mock.Anything).Return(nil)
 
-	emailService := new(email.MockEmailService)
-	emailService.On("SendVerificationEmail", mock.Anything).Return(nil)
+	emailClient := new(emails.MockEmailClient)
+	emailClient.On("SendVerificationEmail", mock.Anything, mock.Anything).Return(nil)
 
 	s.server = handlers.Server{
-		DB:           db,
-		Emitter:      emitter,
-		EmailService: emailService,
+		DB:          db,
+		Emitter:     emitter,
+		EmailClient: emailClient,
 	}
 }
 
-func (s RegisterSuite) TestRegister() {
+func (s *RegisterSuite) TestRegister() {
 	gin.SetMode(gin.TestMode)
 
 	testCases := []struct {
@@ -118,13 +118,15 @@ func (s RegisterSuite) TestRegister() {
 
 			s.Equal(tC.expectedStatusCode, response.StatusCode)
 			var msg gin.H
-			json.NewDecoder(response.Body).Decode(&msg)
+			if err := json.NewDecoder(response.Body).Decode(&msg); err != nil {
+				s.Fail(err.Error())
+			}
 			s.Equal(tC.expectedResponse, msg)
 		})
 	}
 }
 
-func (s RegisterSuite) TestVerifyEmail() {
+func (s *RegisterSuite) TestVerifyEmail() {
 	gin.SetMode(gin.TestMode)
 
 	testCases := []struct {
@@ -162,7 +164,9 @@ func (s RegisterSuite) TestVerifyEmail() {
 			s.Equal(tC.expectedStatusCode, response.StatusCode)
 
 			var msg gin.H
-			json.NewDecoder(response.Body).Decode(&msg)
+			if err := json.NewDecoder(response.Body).Decode(&msg); err != nil {
+				s.Fail(err.Error())
+			}
 			s.Equal(tC.expectedResponse, msg)
 		})
 	}

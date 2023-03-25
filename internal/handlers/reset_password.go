@@ -1,10 +1,12 @@
 package handlers
 
 import (
+	"context"
+	"log"
 	"net/http"
 
 	"github.com/Slimo300/MicroservicesChatApp/backend/lib/apperrors"
-	emails "github.com/Slimo300/chat-userservice/email"
+	emailspb "github.com/Slimo300/chat-emailservice/pkg/client/pb"
 	"github.com/gin-gonic/gin"
 )
 
@@ -26,13 +28,13 @@ func (s *Server) ForgotPassword(c *gin.Context) {
 
 	if user != nil && resetCode != nil {
 		go func() {
-			s.EmailService.SendEmail("reset.page.html", emails.EmailData{
-				Subject: "Reset Password",
-				Email:   user.Email,
-				Name:    user.UserName,
-				Code:    resetCode.ResetCode,
-				Origin:  s.Origin,
-			})
+			if err := s.EmailClient.SendResetPasswordEmail(context.TODO(), &emailspb.EmailData{
+				Email: user.Email,
+				Name:  user.UserName,
+				Code:  resetCode.ResetCode,
+			}); err != nil {
+				log.Println(err)
+			}
 		}()
 	}
 

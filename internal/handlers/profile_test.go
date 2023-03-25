@@ -11,9 +11,9 @@ import (
 	"github.com/Slimo300/MicroservicesChatApp/backend/lib/apperrors"
 	mockqueue "github.com/Slimo300/MicroservicesChatApp/backend/lib/msgqueue/mock"
 	"github.com/Slimo300/MicroservicesChatApp/backend/lib/storage"
-	mockdb "github.com/Slimo300/chat-userservice/database/mock"
-	"github.com/Slimo300/chat-userservice/handlers"
-	"github.com/Slimo300/chat-userservice/models"
+	mockdb "github.com/Slimo300/chat-userservice/internal/database/mock"
+	"github.com/Slimo300/chat-userservice/internal/handlers"
+	"github.com/Slimo300/chat-userservice/internal/models"
 	limits "github.com/gin-contrib/size"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -63,7 +63,7 @@ func (s *ProfileTestSuite) SetupSuite() {
 	}
 }
 
-func (s ProfileTestSuite) TestGetUser() {
+func (s *ProfileTestSuite) TestGetUser() {
 	gin.SetMode(gin.TestMode)
 
 	testCases := []struct {
@@ -115,11 +115,15 @@ func (s ProfileTestSuite) TestGetUser() {
 			var respBody interface{}
 			if tC.returnVal {
 				var user models.User
-				json.NewDecoder(response.Body).Decode(&user)
+				if err := json.NewDecoder(response.Body).Decode(&user); err != nil {
+					s.Fail(err.Error())
+				}
 				respBody = user
 			} else {
 				var msg gin.H
-				json.NewDecoder(response.Body).Decode(&msg)
+				if err := json.NewDecoder(response.Body).Decode(&msg); err != nil {
+					s.Fail(err.Error())
+				}
 				respBody = msg
 			}
 
@@ -128,7 +132,7 @@ func (s ProfileTestSuite) TestGetUser() {
 	}
 }
 
-func (s ProfileTestSuite) TestChangePassword() {
+func (s *ProfileTestSuite) TestChangePassword() {
 	gin.SetMode(gin.TestMode)
 
 	testCases := []struct {
@@ -201,14 +205,16 @@ func (s ProfileTestSuite) TestChangePassword() {
 			s.Equal(tC.expectedStatusCode, response.StatusCode)
 
 			var msg gin.H
-			json.NewDecoder(response.Body).Decode(&msg)
+			if err := json.NewDecoder(response.Body).Decode(&msg); err != nil {
+				s.Fail(err.Error())
+			}
 
 			s.Equal(tC.expectedResponse, msg)
 		})
 	}
 }
 
-func (s ProfileTestSuite) TestDeleteProfilePicture() {
+func (s *ProfileTestSuite) TestDeleteProfilePicture() {
 	gin.SetMode(gin.TestMode)
 
 	testCases := []struct {
@@ -260,14 +266,16 @@ func (s ProfileTestSuite) TestDeleteProfilePicture() {
 
 			s.Equal(tC.expectedStatusCode, response.StatusCode)
 			var msg gin.H
-			json.NewDecoder(response.Body).Decode(&msg)
+			if err := json.NewDecoder(response.Body).Decode(&msg); err != nil {
+				s.Fail(err.Error())
+			}
 
 			s.Equal(tC.expectedResponse, msg)
 		})
 	}
 }
 
-func (s ProfileTestSuite) TestSetProfilePicture() {
+func (s *ProfileTestSuite) TestSetProfilePicture() {
 	gin.SetMode(gin.TestMode)
 
 	testCases := []struct {
@@ -357,10 +365,15 @@ func (s ProfileTestSuite) TestSetProfilePicture() {
 
 			var respBody interface{}
 			if tC.setBodyLimiter {
-				json.NewDecoder(response.Body).Decode(&respBody)
+				if n, err := response.Body.Read([]byte{}); err != nil || n != 0 {
+					s.Fail("Response should be empty whe 413 status is returned")
+				}
+
 			} else {
 				var msg gin.H
-				json.NewDecoder(response.Body).Decode(&msg)
+				if err := json.NewDecoder(response.Body).Decode(&msg); err != nil {
+					s.Fail(err.Error())
+				}
 				respBody = msg
 			}
 

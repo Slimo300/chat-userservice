@@ -3,7 +3,7 @@
 package mock
 
 import (
-	models "github.com/Slimo300/chat-userservice/models"
+	models "github.com/Slimo300/chat-userservice/internal/models"
 	uuid "github.com/google/uuid"
 	mock "github.com/stretchr/testify/mock"
 )

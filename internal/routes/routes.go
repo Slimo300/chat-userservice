@@ -1,8 +1,8 @@
 package routes
 
 import (
-	"github.com/Slimo300/MicroservicesChatApp/backend/lib/auth"
-	"github.com/Slimo300/chat-userservice/handlers"
+	tokens "github.com/Slimo300/chat-tokenservice/pkg/client"
+	"github.com/Slimo300/chat-userservice/internal/handlers"
 	limits "github.com/gin-contrib/size"
 	"github.com/gin-gonic/gin"
 )
@@ -23,7 +23,7 @@ func Setup(server *handlers.Server, origin string) *gin.Engine {
 	api.POST("/login", server.SignIn)
 	api.POST("/refresh", server.RefreshToken)
 
-	apiAuth := api.Use(auth.MustAuth(server.TokenService))
+	apiAuth := api.Use(tokens.MustAuth(server.TokenClient))
 
 	apiAuth.POST("/signout", server.SignOutUser)
 

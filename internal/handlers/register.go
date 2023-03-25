@@ -1,13 +1,14 @@
 package handlers
 
 import (
+	"context"
 	"log"
 	"net/http"
 
 	"github.com/Slimo300/MicroservicesChatApp/backend/lib/apperrors"
 	"github.com/Slimo300/MicroservicesChatApp/backend/lib/events"
-	"github.com/Slimo300/chat-userservice/email"
-	"github.com/Slimo300/chat-userservice/models"
+	emailpb "github.com/Slimo300/chat-emailservice/pkg/client/pb"
+	"github.com/Slimo300/chat-userservice/internal/models"
 	"github.com/gin-gonic/gin"
 )
 
@@ -45,13 +46,13 @@ func (s *Server) RegisterUser(c *gin.Context) {
 	}
 	if user != nil && verificationCode != nil {
 		go func() {
-			s.EmailService.SendEmail("verification.page.html", email.EmailData{
-				Subject: "Verification Email",
-				Email:   user.Email,
-				Name:    user.UserName,
-				Code:    verificationCode.ActivationCode,
-				Origin:  s.Origin,
-			})
+			if err := s.EmailClient.SendVerificationEmail(context.TODO(), &emailpb.EmailData{
+				Email: user.Email,
+				Name:  user.UserName,
+				Code:  verificationCode.ActivationCode,
+			}); err != nil {
+				log.Println(err)
+			}
 		}()
 	}
 

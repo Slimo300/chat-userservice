@@ -4,9 +4,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/Slimo300/chat-userservice/models"
+	"github.com/Slimo300/chat-userservice/internal/models"
 	"gorm.io/driver/mysql"
-	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
@@ -37,19 +36,9 @@ func WithConfig(conf DBConfig) Option {
 }
 
 // Setup creates Database object and initializes connection between MySQL database
-func Setup(dbtype, address string, options ...Option) (*Database, error) {
+func Setup(address string, options ...Option) (*Database, error) {
 
-	var dialector gorm.Dialector
-	switch dbtype {
-	case "MYSQL":
-		dialector = mysql.Open(fmt.Sprintf("%s?parseTime=true", address))
-	case "PostgreSQL":
-		dialector = postgres.Open(address)
-	default:
-		return nil, fmt.Errorf("Unsupported database type: %s", dbtype)
-	}
-
-	conn, err := gorm.Open(dialector, &gorm.Config{
+	conn, err := gorm.Open(mysql.Open(fmt.Sprintf("%s?parseTime=true", address)), &gorm.Config{
 		SkipDefaultTransaction: true,
 	})
 	if err != nil {

@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"context"
 	"net/http"
 
 	"github.com/Slimo300/MicroservicesChatApp/backend/lib/apperrors"
@@ -23,7 +24,7 @@ func (s *Server) SignIn(c *gin.Context) {
 		c.JSON(apperrors.Status(err), gin.H{"err": err.Error()})
 		return
 	}
-	tokenPair, err := s.TokenService.NewPairFromUserID(user.ID)
+	tokenPair, err := s.TokenClient.NewPairFromUserID(context.TODO(), user.ID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"err": err.Error()})
 		return
@@ -44,7 +45,7 @@ func (s *Server) SignOutUser(c *gin.Context) {
 		return
 	}
 
-	if err := s.TokenService.DeleteUserToken(refresh); err != nil {
+	if err := s.TokenClient.DeleteUserToken(context.TODO(), refresh); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"err": err.Error()})
 		return
 	}
@@ -63,7 +64,7 @@ func (s *Server) RefreshToken(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"err": "No token provided"})
 		return
 	}
-	tokens, err := s.TokenService.NewPairFromRefresh(refresh)
+	tokens, err := s.TokenClient.NewPairFromRefresh(context.TODO(), refresh)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"err": err.Error()})
 		return

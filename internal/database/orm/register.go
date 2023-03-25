@@ -5,8 +5,8 @@ import (
 	"time"
 
 	"github.com/Slimo300/MicroservicesChatApp/backend/lib/apperrors"
-	"github.com/Slimo300/chat-userservice/database"
-	"github.com/Slimo300/chat-userservice/models"
+	"github.com/Slimo300/chat-userservice/internal/database"
+	"github.com/Slimo300/chat-userservice/internal/models"
 	"github.com/google/uuid"
 	"github.com/thanhpk/randstr"
 	"gorm.io/gorm"
@@ -61,7 +61,6 @@ func (db *Database) VerifyCode(code string) (*models.User, error) {
 		return nil, apperrors.NewNotFound("code", code)
 	}
 
-	elapsed := time.Now().Sub(verCode.Created)
 	if err := db.Transaction(func(tx *gorm.DB) error {
 
 		// we first delete verCode because no matter if code is expired or not
@@ -72,7 +71,7 @@ func (db *Database) VerifyCode(code string) (*models.User, error) {
 
 		// if verification code expired we delete created user and return not found error
 		// pretending we don't know what the user wants ¯\_(ツ)_/¯
-		if elapsed > db.Config.VerificationCodeDuration {
+		if time.Since(verCode.Created) > db.Config.VerificationCodeDuration {
 			if err := tx.Delete(&user).Error; err != nil {
 				return apperrors.NewInternal()
 			}
