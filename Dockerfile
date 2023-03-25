@@ -20,7 +20,7 @@ USER nonroot:nonroot
 COPY --from=build app/userservice /userservice
 
 # Database address for storing user information
-ENV DB_ADDRESS=
+ENV MYSQL_ADDRESS=
 # Port for HTTP traffic
 ENV HTTP_PORT=8080
 # Port for HTTPS traffic
@@ -39,9 +39,6 @@ ENV BROKER_ADDRESS=
 ENV CERT_DIR=/etc/cert
 # S3 Bucket name for storing user profile pictures
 ENV S3_BUCKET=
-
-
-ENV CHAT_CONFIG=.
 
 EXPOSE 8080
 EXPOSE 8090
